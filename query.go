@@ -1,5 +1,18 @@
 package myth
 
+// Query1 visits entity generations in the pool's dense order.
+// Nil pools or callbacks are ignored. Callbacks may update components but must
+// not add or remove components from participating pools or retain pointers.
+func Query1[A any](poolA *Pool[A], yield func(entity Entity, a *A)) {
+	if poolA == nil || yield == nil {
+		return
+	}
+	for index, id := range poolA.entities {
+		entity := Entity{ID: id, Generation: poolA.generations[index]}
+		yield(entity, &poolA.components[index])
+	}
+}
+
 // Query2 visits matching entity generations in the smaller pool's dense order.
 // Nil pools or callbacks are ignored. Callbacks may update components but must
 // not add or remove components from participating pools or retain pointers.
